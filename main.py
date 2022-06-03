@@ -1,5 +1,4 @@
 import time
-import pprint
 import praw
 import os
 import requests
@@ -18,12 +17,8 @@ SPOTIPY_CLIENT_ID = os.getenv('SPOTIPY_CLIENT_ID')
 SPOTIPY_CLIENT_SECRET = os.getenv('SPOTIPY_CLIENT_SECRET')
 SPOTIPY_REDIRECT_URI = os.getenv('SPOTIPY_REDIRECT_URI')
 
-video_ids = list()
 reddit_titles = list()
-youtube_titles = list()
 song_uris = list()
-current_items_in_playlist = list()
-final_uris = list()
 
 reddit = praw.Reddit(
         client_id=CLIENT_ID,
@@ -33,23 +28,14 @@ reddit = praw.Reddit(
 
 subreddit = reddit.subreddit('progmetal')
 
-
-
 def check_if_ffo(listed_title):
     for word in listed_title:
         if 'FFO' in word:
             return listed_title.index(word)
 
 for submission in subreddit.top(limit=None,time_filter='day'):
-    if not submission.is_self:
-        # GET URL FOR YOUTUBE QUERY
-        if 'youtube.com' in submission.url:
-            id = submission.url.split('=')
-            video_ids.append(id[-1])
-        elif 'youtu.be' in submission.url:
-            id = submission.url.split('/')
-            video_ids.append(id[-1])
-        # GET REDDIT TITLE WITHOUT FFO
+    if not submission.is_self and ('youtube.com' in submission.url or 'youtu.be' in submission.url):
+#        if 'youtube.com' in submission.url or 'youtu.be' in submission.url:
         title = submission.title.split()
         if check_if_ffo(title) != None:
             index = check_if_ffo(title)
@@ -60,33 +46,10 @@ for submission in subreddit.top(limit=None,time_filter='day'):
                 pass
         reddit_titles.append(title)
 
-# BUILD QUERY FROM YOUTUBE TITLES
-
-youtube_params = {'key': GOOGLE_API, 'part': 'snippet', 'id': ','.join(video_ids)}
-
-youtube_r = requests.get('https://youtube.googleapis.com/youtube/v3/videos', params=youtube_params)
-
-forbidden_names = ['official', 'video', 'audio', 'visualizer', 'music']
-
-for item in youtube_r.json()['items']:
-    title = item['snippet']['title'].lower().split()
-    for forbidden in forbidden_names:
-        for word in title:
-            if forbidden in word:
-                title.remove(word)
-    youtube_titles.append(title)
-
 sp = spotipy.Spotify(auth_manager=SpotifyOAuth(client_id=SPOTIPY_CLIENT_ID,
                                                client_secret=SPOTIPY_CLIENT_SECRET,
                                                redirect_uri=SPOTIPY_REDIRECT_URI,
                                                scope='playlist-modify-public'))
-
-
-current_playlist_state = sp.playlist_tracks('3TnbT8juRWLXxkHEDZtGlO',fields='items.track.uri',limit=100)
-
-for uri in current_playlist_state['items']:
-    current_items_in_playlist.append(uri['track']['uri'])
-
 
 for song in reddit_titles:
     q = ' '.join(song)
@@ -102,9 +65,4 @@ for song in reddit_titles:
         except:
             pass
 
-for song in song_uris:
-    if song not in current_items_in_playlist:
-        final_uris.append(song)
-
-
-sp.playlist_add_items('3TnbT8juRWLXxkHEDZtGlO', final_uris)
+sp.playlist_add_items('3TnbT8juRWLXxkHEDZtGlO', song_uris)
