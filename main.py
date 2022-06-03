@@ -22,6 +22,8 @@ video_ids = list()
 reddit_titles = list()
 youtube_titles = list()
 song_uris = list()
+current_items_in_playlist = list()
+final_uris = list()
 
 reddit = praw.Reddit(
         client_id=CLIENT_ID,
@@ -80,6 +82,11 @@ sp = spotipy.Spotify(auth_manager=SpotifyOAuth(client_id=SPOTIPY_CLIENT_ID,
                                                scope='playlist-modify-public'))
 
 
+current_playlist_state = sp.playlist_tracks('3TnbT8juRWLXxkHEDZtGlO',fields='items.track.uri',limit=100)
+
+for uri in current_playlist_state['items']:
+    current_items_in_playlist.append(uri['track']['uri'])
+
 
 for song in reddit_titles:
     q = ' '.join(song)
@@ -95,4 +102,9 @@ for song in reddit_titles:
         except:
             pass
 
-sp.playlist_add_items('3TnbT8juRWLXxkHEDZtGlO', song_uris)
+for song in song_uris:
+    if song not in current_items_in_playlist:
+        final_uris.append(song)
+
+
+sp.playlist_add_items('3TnbT8juRWLXxkHEDZtGlO', final_uris)
