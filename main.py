@@ -1,3 +1,5 @@
+import time
+import pprint
 import praw
 import os
 import requests
@@ -19,7 +21,7 @@ SPOTIPY_REDIRECT_URI = os.getenv('SPOTIPY_REDIRECT_URI')
 video_ids = list()
 reddit_titles = list()
 youtube_titles = list()
-
+song_uris = list()
 
 reddit = praw.Reddit(
         client_id=CLIENT_ID,
@@ -72,10 +74,21 @@ for item in youtube_r.json()['items']:
                 title.remove(word)
     youtube_titles.append(title)
 
-sp = spotipy.Spotify(auth_manager=SpotifyOAuth(client_id="SPOT_ID",
-                                               client_secret="SPOT_SECRET",
-                                               redirect_uri="SPOT_REDIRECT",
-                                               scope="playlist-modify-public"))
+sp = spotipy.Spotify(auth_manager=SpotifyOAuth(client_id=SPOTIPY_CLIENT_ID,
+                                               client_secret=SPOTIPY_CLIENT_SECRET,
+                                               redirect_uri=SPOTIPY_REDIRECT_URI,
+                                               scope='playlist-modify-public'))
 
+for song in reddit_titles:
+    q = ' '.join(song)
+    try:
+        result = sp.search(q,limit=1)
+
+    except:
+        try:
+            result = sp.search(q,limit=1)
+        except:
+            pass
+    time.sleep(1)
 
 
