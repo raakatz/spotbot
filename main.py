@@ -3,6 +3,8 @@ import os
 import requests
 import json
 from dotenv import load_dotenv
+import spotipy
+from spotipy.oauth2 import SpotifyOAuth
 
 load_dotenv()
 
@@ -10,14 +12,14 @@ CLIENT_ID = os.getenv('CLIENT_ID')
 CLIENT_SECRET = os.getenv('CLIENT_SECRET')
 USER_AGENT = os.getenv('USER_AGENT')
 GOOGLE_API = os.getenv('GOOGLE_API')
-SPOT_ID = os.getenv('SPOT_ID')
-SPOT_SECRET = os.getenv('SPOT_SECRET')
+SPOTIPY_CLIENT_ID = os.getenv('SPOTIPY_CLIENT_ID')
+SPOTIPY_CLIENT_SECRET = os.getenv('SPOTIPY_CLIENT_SECRET')
+SPOTIPY_REDIRECT_URI = os.getenv('SPOTIPY_REDIRECT_URI')
 
 video_ids = list()
 reddit_titles = list()
 youtube_titles = list()
 
-print(CLIENT_SECRET)
 
 reddit = praw.Reddit(
         client_id=CLIENT_ID,
@@ -69,4 +71,11 @@ for item in youtube_r.json()['items']:
             if forbidden in word:
                 title.remove(word)
     youtube_titles.append(title)
+
+sp = spotipy.Spotify(auth_manager=SpotifyOAuth(client_id="SPOT_ID",
+                                               client_secret="SPOT_SECRET",
+                                               redirect_uri="SPOT_REDIRECT",
+                                               scope="playlist-modify-public"))
+
+
 
