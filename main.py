@@ -10,6 +10,8 @@ CLIENT_ID = os.getenv('CLIENT_ID')
 CLIENT_SECRET = os.getenv('CLIENT_SECRET')
 USER_AGENT = os.getenv('USER_AGENT')
 GOOGLE_API = os.getenv('GOOGLE_API')
+SPOT_ID = os.getenv('SPOT_ID')
+SPOT_SECRET = os.getenv('SPOT_SECRET')
 
 video_ids = list()
 reddit_titles = list()
