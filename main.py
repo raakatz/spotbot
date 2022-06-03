@@ -79,16 +79,20 @@ sp = spotipy.Spotify(auth_manager=SpotifyOAuth(client_id=SPOTIPY_CLIENT_ID,
                                                redirect_uri=SPOTIPY_REDIRECT_URI,
                                                scope='playlist-modify-public'))
 
+
+
 for song in reddit_titles:
     q = ' '.join(song)
     try:
         result = sp.search(q,limit=1)
-
+        song_uris.append(result['tracks']['items'][0]['uri'])
+        time.sleep(2)
     except:
         try:
             result = sp.search(q,limit=1)
+            song_uris.append(result['tracks']['items'][0]['uri'])
+            time.sleep(2)
         except:
             pass
-    time.sleep(1)
 
-
+sp.playlist_add_items('3TnbT8juRWLXxkHEDZtGlO', song_uris)
