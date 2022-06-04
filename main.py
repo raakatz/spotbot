@@ -1,13 +1,11 @@
 import time
 import praw
 import os
-import requests
 import json
 from dotenv import load_dotenv
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 import re
-import pprint
 
 load_dotenv()
 
