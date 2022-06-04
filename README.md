@@ -6,4 +6,6 @@ If you want to edit this for your own use, please follow the API documentation b
 
 Credentials should be placed in a .env file in the project's root. Of course, it's included in .gitignore.
 
+Tested on Python 3.10.4
+
 Enjoy!
